@@ -1,73 +1,83 @@
-# Welcome to your Lovable project
+# In Answer Genius
 
-## Project info
+Анализ видимости сайтов в ответах ИИ-поисковиков.
 
-**URL**: https://lovable.dev/projects/5b8d6c7f-f509-49c7-88ab-2390ec0df210
+## Описание проекта
 
-## How can I edit this code?
+**In Answer Genius** — это веб-приложение для анализа видимости сайтов в ответах ИИ-поисковиков. Приложение помогает определить, упоминается ли ваш сайт в генеративных ответах ИИ и дает конкретные рекомендации по улучшению цитируемости.
 
-There are several ways of editing your application.
+## Функциональность
 
-**Use Lovable**
+- ✅ Анализ попадания сайта в ответы ИИ-поисковиков
+- ✅ Оценка цитируемости контента (score 3-8 из 10)
+- ✅ Генерация персональных рекомендаций по улучшению
+- ✅ Расчет вероятности попадания в ответы ИИ (30-90%)
+- ✅ Современный адаптивный интерфейс
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/5b8d6c7f-f509-49c7-88ab-2390ec0df210) and start prompting.
+## Технологии
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Frontend**: React 18 + TypeScript + Vite
+- **UI Framework**: shadcn/ui + Radix UI компоненты
+- **Стилизация**: Tailwind CSS с кастомной дизайн-системой
+- **Роутинг**: React Router DOM
+- **Состояние**: React Query (TanStack Query)
+- **Формы**: React Hook Form + Zod валидация
 
-**Use your preferred IDE**
+## Установка и запуск
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Требования
+- Node.js (версия 16 или выше)
+- npm или yarn
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+### Установка
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# Клонирование репозитория
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Переход в директорию проекта
+cd in-answer-genius
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Установка зависимостей
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Запуск dev-сервера
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Доступные команды
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```sh
+# Запуск в режиме разработки
+npm run dev
 
-**Use GitHub Codespaces**
+# Сборка для продакшена
+npm run build
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+# Предварительный просмотр продакшен сборки
+npm run preview
 
-## What technologies are used for this project?
+# Линтинг кода
+npm run lint
+```
 
-This project is built with:
+## Развертывание
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Для развертывания приложения выполните сборку:
 
-## How can I deploy this project?
+```sh
+npm run build
+```
 
-Simply open [Lovable](https://lovable.dev/projects/5b8d6c7f-f509-49c7-88ab-2390ec0df210) and click on Share -> Publish.
+Статические файлы будут созданы в папке `dist/` и готовы для развертывания на любом веб-сервере или хостинге статических сайтов.
 
-## Can I connect a custom domain to my Lovable project?
+## Планируемая интеграция
 
-Yes, you can!
+Приложение готово к интеграции с:
+- **Yandex Search API v2** — для проверки упоминаний в генеративных ответах
+- **OpenAI GPT-4 API** — для анализа контента и оценки цитируемости
+- **Fetch API** — для получения и анализа контента сайтов
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Лицензия
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+MIT License
