@@ -1,42 +1,74 @@
-# Инструкция по деплою на GitHub Pages
+# Инструкция по деплою на Vercel
 
 ## Автоматический деплой
 
-1. **Включите GitHub Pages в настройках репозитория:**
-   - Перейдите в Settings → Pages
-   - Source: GitHub Actions
-   - Сохраните настройки
+### 1. Подключение к Vercel
 
-2. **Настройте кастомный домен (опционально):**
-   - В Settings → Pages → Custom domain введите: `inanswer.pro`
-   - Включите "Enforce HTTPS"
+1. **Войдите в Vercel Dashboard:**
+   - Перейдите на [vercel.com](https://vercel.com)
+   - Войдите через GitHub аккаунт
 
-3. **Настройте DNS для домена inanswer.pro:**
+2. **Импортируйте проект:**
+   - Нажмите "New Project"
+   - Выберите репозиторий `BrendonIrma/in-answer-genius`
+   - Vercel автоматически определит настройки (Vite + React)
+
+3. **Настройки деплоя:**
+   ```
+   Framework Preset: Vite
+   Root Directory: ./
+   Build Command: npm run build
+   Output Directory: dist
+   Install Command: npm install
+   ```
+
+### 2. Настройка кастомного домена
+
+1. **В Vercel Dashboard:**
+   - Перейдите в Settings → Domains
+   - Добавьте домен: `inanswer.pro`
+   - Следуйте инструкциям по настройке DNS
+
+2. **DNS настройки:**
    ```
    Type: CNAME
    Name: @ (или www)
-   Value: brendoni.github.io
+   Value: cname.vercel-dns.com
    ```
+
+### 3. Автоматический деплой
+
+После настройки каждый коммит в `main` ветку будет автоматически деплоиться:
+- Push в GitHub → Vercel получает webhook
+- Автоматическая сборка и деплой
+- Уведомления в Vercel Dashboard
 
 ## Ручной деплой
 
 ```bash
-# Сборка проекта
-npm run build
+# Установка Vercel CLI
+npm i -g vercel
 
-# Копирование файлов в gh-pages ветку (если используется старый метод)
-# git subtree push --prefix dist origin gh-pages
+# Деплой
+vercel
+
+# Продакшен деплой
+vercel --prod
 ```
 
 ## Проверка деплоя
 
-После пуша в main ветку:
-1. GitHub Actions автоматически соберет и задеплоит проект
-2. Сайт будет доступен по адресу: `https://inanswer.pro`
-3. Проверить статус можно в разделе Actions репозитория
+1. **В Vercel Dashboard:**
+   - Раздел "Deployments" показывает все деплои
+   - Статус: Ready, Building, Error
+   - Время деплоя и логи
+
+2. **URL деплоя:**
+   - Preview: `https://in-answer-genius-xxx.vercel.app`
+   - Production: `https://inanswer.pro`
 
 ## Устранение проблем
 
-- **404 ошибки**: Проверьте base path в vite.config.ts
-- **Проблемы с CSS**: Убедитесь, что все пути к ресурсам корректные
-- **Домен не работает**: Проверьте DNS настройки и CNAME файл
+- **Build ошибки**: Проверьте логи в Vercel Dashboard
+- **Домен не работает**: Проверьте DNS настройки
+- **Медленная загрузка**: Проверьте размер бандла и оптимизацию
