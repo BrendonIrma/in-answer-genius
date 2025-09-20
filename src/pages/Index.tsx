@@ -8,6 +8,7 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [currentAnalysis, setCurrentAnalysis] = useState<{url: string, query: string} | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const { toast } = useToast();
 
   const handleAnalyze = async (url: string, query: string) => {
@@ -41,6 +42,23 @@ const Index = () => {
     }
   };
 
+  const handleNewAnalysis = () => {
+    setIsTransitioning(true);
+    
+    // Небольшая задержка для плавного перехода
+    setTimeout(() => {
+      setResult(null);
+      setCurrentAnalysis(null);
+      setIsLoading(false);
+      setIsTransitioning(false);
+      
+      // Прокручиваем к началу страницы для показа формы анализа
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 100);
+    }, 200);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -50,8 +68,13 @@ const Index = () => {
             <h1 className="text-3xl font-bold bg-primary-gradient bg-clip-text text-transparent mb-2">
               In Answer
             </h1>
+            <div className="mb-4">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                Powered by YandexGPT
+              </span>
+            </div>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Проверьте, упоминается ли ваш сайт в ответах ИИ-поисковиков и получите рекомендации по улучшению видимости
+              Проверьте, упоминается ли ваш сайт в ответах Yandex GPT и получите рекомендации по улучшению видимости
             </p>
           </div>
         </div>
@@ -60,13 +83,15 @@ const Index = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 space-y-8">
         {!result && (
-          <div className="flex justify-center">
+          <div className={`flex justify-center transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
             <AnalysisForm onAnalyze={handleAnalyze} isLoading={isLoading} />
           </div>
         )}
         
         {result && (
-          <AnalysisResults result={result} onRetry={handleRetry} />
+            <div className={`transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+              <AnalysisResults result={result} onRetry={handleRetry} onNewAnalysis={handleNewAnalysis} />
+            </div>
         )}
       </main>
 
@@ -75,10 +100,10 @@ const Index = () => {
         <div className="container mx-auto px-4 py-8">
           <div className="text-center text-sm text-muted-foreground">
             <p className="mb-2">
-              <strong>In Answer</strong> — анализ видимости в ответах ИИ-поисковиков
+              <strong>In Answer</strong> — анализ видимости в ответах Yandex GPT
             </p>
             <p>
-              Демо-версия • Для полной функциональности требуются API ключи Yandex Search API v2 и OpenAI GPT-4
+              Работает с YandexGPT API • Для полной функциональности требуется API ключ Yandex Cloud
             </p>
           </div>
         </div>

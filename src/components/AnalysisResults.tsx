@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, XCircle, TrendingUp, AlertTriangle, RefreshCw } from 'lucide-react';
+import { CheckCircle, XCircle, TrendingUp, AlertTriangle, RefreshCw, Plus } from 'lucide-react';
 
 export interface AnalysisResult {
   url: string;
@@ -16,9 +16,10 @@ export interface AnalysisResult {
 interface AnalysisResultsProps {
   result: AnalysisResult;
   onRetry: () => void;
+  onNewAnalysis: () => void;
 }
 
-export function AnalysisResults({ result, onRetry }: AnalysisResultsProps) {
+export function AnalysisResults({ result, onRetry, onNewAnalysis }: AnalysisResultsProps) {
   const getScoreColor = (score: number, max: number) => {
     const percentage = (score / max) * 100;
     if (percentage >= 80) return 'text-success';
@@ -131,14 +132,24 @@ export function AnalysisResults({ result, onRetry }: AnalysisResultsProps) {
         </CardContent>
       </Card>
 
-      {/* Кнопка повторного анализа */}
-      <div className="text-center">
+      {/* Кнопки действий */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
+        <Button 
+          onClick={onNewAnalysis}
+          size="lg"
+          className="h-14 px-10 bg-primary-gradient hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-xl text-white font-semibold"
+        >
+          <Plus className="w-5 h-5 mr-2" />
+          Начать новый анализ
+        </Button>
+        
         <Button 
           onClick={onRetry}
           variant="outline" 
-          className="h-12 px-8 border-2 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300"
+          size="lg"
+          className="h-14 px-10 border-2 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300"
         >
-          <RefreshCw className="w-4 h-4 mr-2" />
+          <RefreshCw className="w-5 h-5 mr-2" />
           Повторить анализ
         </Button>
       </div>
