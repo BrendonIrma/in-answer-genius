@@ -3,8 +3,15 @@ import type { AnalysisResult } from '@/components/AnalysisResults';
 // Сервис анализа сайтов через бэкенд API
 export class AnalysisService {
   private static readonly API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+  private static readonly IS_PRODUCTION = import.meta.env.PROD;
 
   static async analyzeWebsite(url: string, query: string): Promise<AnalysisResult> {
+    // В продакшене пока используем только fallback (бэкенд не деплоен)
+    if (this.IS_PRODUCTION) {
+      console.log('🌐 Продакшен режим: используем fallback данные');
+      return this.generateFallbackResult(url, query);
+    }
+
     try {
       console.log('🚀 Отправляем запрос на бэкенд...');
       
@@ -33,15 +40,7 @@ export class AnalysisService {
       console.error('Ошибка при анализе сайта:', error);
       
       // Fallback к демо-данным при ошибке
-      return {
-        url,
-        query,
-        isInAiAnswer: false,
-        citabilityScore: 5,
-        maxScore: 10,
-        recommendations: this.generateRecommendations(),
-        successChance: 50,
-      };
+      return this.generateFallbackResult(url, query);
     }
   }
 
@@ -85,6 +84,18 @@ export class AnalysisService {
     // Возвращаем 3 случайные рекомендации
     const shuffled = allRecommendations.sort(() => 0.5 - Math.random());
     return shuffled.slice(0, 3);
+  }
+
+  private static generateFallbackResult(url: string, query: string): AnalysisResult {
+    return {
+      url,
+      query,
+      isInAiAnswer: false,
+      citabilityScore: 5,
+      maxScore: 10,
+      recommendations: this.generateRecommendations(),
+      successChance: 50,
+    };
   }
 
   // Методы для будущего расширения:
