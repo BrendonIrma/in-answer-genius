@@ -7,17 +7,17 @@ class AnalysisService {
       // Проверяем кэш
       const cachedResult = await this.getCachedResult(url, query);
       if (cachedResult) {
-        console.log('📦 Результат получен из кэша');
+        console.log('Результат получен из кэша');
         return cachedResult;
       }
 
       // Выполняем анализ через YandexGPT
-      console.log('🤖 Выполняем анализ через YandexGPT...');
-      console.log('🔑 API Key:', process.env.YANDEX_API_KEY ? 'Set' : 'Not set');
-      console.log('📁 Folder ID:', process.env.YANDEX_FOLDER_ID ? 'Set' : 'Not set');
+      console.log('Выполняем анализ через YandexGPT...');
+      console.log('API Key:', process.env.YANDEX_API_KEY ? 'Set' : 'Not set');
+      console.log('Folder ID:', process.env.YANDEX_FOLDER_ID ? 'Set' : 'Not set');
       
       const analysis = await yandexGPTService.analyzeWebsite(url, query);
-      console.log('✅ YandexGPT анализ завершен:', analysis);
+      console.log('YandexGPT анализ завершен:', analysis);
       
       // Рассчитываем шанс успеха
       const successChance = Math.min(90, Math.max(30, 
@@ -79,7 +79,7 @@ class AnalysisService {
       ];
 
       const result = db.prepare(sql).run(params);
-      console.log('💾 Анализ сохранен в базу данных, ID:', result.lastInsertRowid);
+          console.log('Анализ сохранен в базу данных, ID:', result.lastInsertRowid);
       return result.lastInsertRowid;
     } catch (error) {
       console.error('Ошибка сохранения анализа:', error);
@@ -135,7 +135,7 @@ class AnalysisService {
       ];
 
       db.prepare(sql).run(params);
-      console.log('💾 Результат сохранен в кэш');
+          console.log('Результат сохранен в кэш');
     } catch (error) {
       console.error('Ошибка сохранения в кэш:', error);
       throw error;

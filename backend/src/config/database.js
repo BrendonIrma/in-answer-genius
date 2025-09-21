@@ -57,10 +57,10 @@ export async function initDatabase() {
     `;
     
     database.exec(createTableSQL);
-    console.log('✅ Таблица analyses создана');
+          console.log('Таблица analyses создана');
     
     database.exec(createCacheTableSQL);
-    console.log('✅ Таблица cache создана');
+    console.log('Таблица cache создана');
     
     return Promise.resolve();
   } catch (error) {
@@ -73,7 +73,7 @@ export function closeDatabase() {
   if (db) {
     try {
       db.close();
-      console.log('✅ База данных закрыта');
+        console.log('База данных закрыта');
     } catch (err) {
       console.error('Ошибка закрытия базы данных:', err);
     }

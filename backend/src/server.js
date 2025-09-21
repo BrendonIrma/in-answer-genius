@@ -78,15 +78,15 @@ app.use((err, req, res, next) => {
 async function startServer() {
   try {
     await initDatabase();
-    console.log('✅ База данных инициализирована');
+    console.log('База данных инициализирована');
     
     app.listen(PORT, () => {
-      console.log(`🚀 Сервер запущен на порту ${PORT}`);
-      console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
-      console.log(`🔗 API: http://localhost:${PORT}/api/analysis`);
+      console.log(`Сервер запущен на порту ${PORT}`);
+      console.log(`Health check: http://localhost:${PORT}/api/health`);
+      console.log(`API: http://localhost:${PORT}/api/analysis`);
     });
   } catch (error) {
-    console.error('❌ Ошибка запуска сервера:', error);
+    console.error('Ошибка запуска сервера:', error);
     process.exit(1);
   }
 }

@@ -44,7 +44,7 @@ router.post('/', validateAnalysis, async (req, res) => {
   try {
     const { url, query } = req.validatedData;
     
-    console.log(`🔍 Начинаем анализ: ${url} для запроса "${query}"`);
+    console.log(`Начинаем анализ: ${url} для запроса "${query}"`);
     
     const result = await analysisService.analyzeWebsite(url, query);
     

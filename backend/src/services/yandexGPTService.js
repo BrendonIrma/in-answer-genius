@@ -11,7 +11,7 @@ class YandexGPTService {
     this.baseUrl = 'https://llm.api.cloud.yandex.net/foundationModels/v1/completion';
     
     if (!this.apiKey || !this.folderId) {
-      console.warn('⚠️ YandexGPT API ключи не настроены');
+      console.warn('YandexGPT API ключи не настроены');
     }
   }
 

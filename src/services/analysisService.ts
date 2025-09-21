@@ -8,12 +8,12 @@ export class AnalysisService {
   static async analyzeWebsite(url: string, query: string): Promise<AnalysisResult> {
     // В продакшене пока используем только fallback (бэкенд не деплоен)
     if (this.IS_PRODUCTION) {
-      console.log('🌐 Продакшен режим: используем fallback данные');
+      console.log('Продакшен режим: используем fallback данные');
       return this.generateFallbackResult(url, query);
     }
 
     try {
-      console.log('🚀 Отправляем запрос на бэкенд...');
+      console.log('Отправляем запрос на бэкенд...');
       
       const response = await fetch(`${this.API_BASE_URL}/analysis`, {
         method: 'POST',
@@ -34,7 +34,7 @@ export class AnalysisService {
         throw new Error(result.message || 'Ошибка анализа');
       }
 
-      console.log('✅ Получен результат от бэкенда');
+      console.log('Получен результат от бэкенда');
       return result.data;
     } catch (error) {
       console.error('Ошибка при анализе сайта:', error);
