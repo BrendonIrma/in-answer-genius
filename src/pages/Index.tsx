@@ -1,45 +1,44 @@
-import { useState } from 'react';
-import { AnalysisForm } from '@/components/AnalysisForm';
-import { AnalysisResults, type AnalysisResult } from '@/components/AnalysisResults';
+import { useState, lazy, Suspense } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { AnalysisService } from '@/services/analysisService';
 import { useToast } from '@/hooks/use-toast';
 
+// Ленивая загрузка компонентов
+const AnalysisForm = lazy(() => import('@/components/AnalysisForm'));
+const AnalysisResults = lazy(() => import('@/components/AnalysisResults'));
+
+// Импортируем тип отдельно
+import type { AnalysisResult } from '@/components/AnalysisResults';
+
 const Index = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<AnalysisResult | null>(null);
   const [currentAnalysis, setCurrentAnalysis] = useState<{url: string, query: string} | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const { toast } = useToast();
 
-  const handleAnalyze = async (url: string, query: string) => {
-    setIsLoading(true);
-    setResult(null);
-    setCurrentAnalysis({ url, query });
+  // Используем React Query для кэширования
+  const { data: result, isLoading, error, refetch } = useQuery({
+    queryKey: ['analysis', currentAnalysis?.url, currentAnalysis?.query],
+    queryFn: () => {
+      if (!currentAnalysis) throw new Error('No analysis parameters');
+      return AnalysisService.analyzeWebsite(currentAnalysis.url, currentAnalysis.query);
+    },
+    enabled: !!currentAnalysis,
+    staleTime: 5 * 60 * 1000, // 5 минут
+    retry: 2,
+  });
 
-    try {
-      const analysisResult = await AnalysisService.analyzeWebsite(url, query);
-      setResult(analysisResult);
-      
-      toast({
-        title: "Анализ завершен",
-        description: "Результаты готовы к просмотру",
-      });
-    } catch (error) {
-      console.error('Analysis error:', error);
-      toast({
-        title: "Ошибка анализа",
-        description: "Не удалось выполнить анализ. Попробуйте еще раз.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleAnalyze = async (url: string, query: string) => {
+    setCurrentAnalysis({ url, query });
+    
+    // Показываем уведомление о начале анализа
+    toast({
+      title: "Анализ начат",
+      description: "Обрабатываем ваш запрос...",
+    });
   };
 
   const handleRetry = () => {
-    if (currentAnalysis) {
-      handleAnalyze(currentAnalysis.url, currentAnalysis.query);
-    }
+    refetch();
   };
 
   const handleNewAnalysis = () => {
@@ -47,9 +46,7 @@ const Index = () => {
     
     // Небольшая задержка для плавного перехода
     setTimeout(() => {
-      setResult(null);
       setCurrentAnalysis(null);
-      setIsLoading(false);
       setIsTransitioning(false);
       
       // Прокручиваем к началу страницы для показа формы анализа
@@ -58,6 +55,23 @@ const Index = () => {
       }, 100);
     }, 200);
   };
+
+  // Обработка ошибок
+  if (error) {
+    toast({
+      title: "Ошибка анализа",
+      description: "Не удалось выполнить анализ. Попробуйте еще раз.",
+      variant: "destructive",
+    });
+  }
+
+  // Показываем уведомление о завершении анализа
+  if (result && !isLoading) {
+    toast({
+      title: "Анализ завершен",
+      description: "Результаты готовы к просмотру",
+    });
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -84,13 +98,25 @@ const Index = () => {
       <main className="container mx-auto px-4 py-8 space-y-8">
         {!result && (
           <div className={`flex justify-center transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
-            <AnalysisForm onAnalyze={handleAnalyze} isLoading={isLoading} />
+            <Suspense fallback={
+              <div className="w-full max-w-2xl mx-auto p-8">
+                <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
+              </div>
+            }>
+              <AnalysisForm onAnalyze={handleAnalyze} isLoading={isLoading} />
+            </Suspense>
           </div>
         )}
         
         {result && (
             <div className={`transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
-              <AnalysisResults result={result} onRetry={handleRetry} onNewAnalysis={handleNewAnalysis} />
+              <Suspense fallback={
+                <div className="w-full max-w-4xl mx-auto p-8">
+                  <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
+                </div>
+              }>
+                <AnalysisResults result={result} onRetry={handleRetry} onNewAnalysis={handleNewAnalysis} />
+              </Suspense>
             </div>
         )}
       </main>

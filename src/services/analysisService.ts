@@ -5,29 +5,10 @@ import { yandexGPTService } from './yandexGPTService';
 export class AnalysisService {
   static async analyzeWebsite(url: string, query: string): Promise<AnalysisResult> {
     try {
-      // Получаем контент сайта
-      const content = await this.fetchSiteContent(url);
+      // Объединяем все API вызовы в один комплексный запрос
+      const analysisResult = await this.performComprehensiveAnalysis(url, query);
       
-      // Анализируем контент с помощью YandexGPT
-      const analysis = await this.analyzeContentWithGPT(content, query);
-      
-      // Проверяем, попадет ли сайт в ответ ИИ
-      const isInAiAnswer = await this.checkYandexAiAnswer(query, url);
-      
-      // Рассчитываем шанс успеха
-      const successChance = Math.min(90, Math.max(30, analysis.score * 10 + (isInAiAnswer ? 20 : 0)));
-
-      const result: AnalysisResult = {
-        url,
-        query,
-        isInAiAnswer,
-        citabilityScore: analysis.score,
-        maxScore: 10,
-        recommendations: analysis.recommendations,
-        successChance,
-      };
-
-      return result;
+      return analysisResult;
     } catch (error) {
       console.error('Ошибка при анализе сайта:', error);
       
@@ -41,6 +22,83 @@ export class AnalysisService {
         recommendations: this.generateRecommendations(),
         successChance: 50,
       };
+    }
+  }
+
+  // Новый метод для комплексного анализа одним запросом
+  private static async performComprehensiveAnalysis(url: string, query: string): Promise<AnalysisResult> {
+    const prompt = `Проанализируй сайт для попадания в ответы ИИ-поисковиков.
+
+URL сайта: ${url}
+Запрос пользователя: "${query}"
+
+Выполни комплексный анализ и ответь в JSON формате:
+{
+  "content": "краткое описание контента сайта",
+  "score": число от 1 до 10 (оценка цитируемости),
+  "isInAiAnswer": true/false (попадет ли в ответ ИИ),
+  "recommendations": ["рекомендация 1", "рекомендация 2", "рекомендация 3"]
+}
+
+Оцени по критериям:
+1. Релевантность контента запросу
+2. Качество и полнота ответа
+3. Структурированность информации
+4. Экспертность и авторитетность`;
+
+    const response = await yandexGPTService.generateCompletion(prompt, {
+      temperature: 0.3,
+      maxTokens: 1000
+    });
+
+    try {
+      // Парсим JSON ответ
+      const analysis = JSON.parse(response);
+      
+      // Рассчитываем шанс успеха
+      const successChance = Math.min(90, Math.max(30, analysis.score * 10 + (analysis.isInAiAnswer ? 20 : 0)));
+
+      return {
+        url,
+        query,
+        isInAiAnswer: analysis.isInAiAnswer || false,
+        citabilityScore: Math.min(10, Math.max(1, analysis.score || 5)),
+        maxScore: 10,
+        recommendations: analysis.recommendations || this.generateRecommendations(),
+        successChance,
+      };
+    } catch (parseError) {
+      console.error('Ошибка парсинга ответа YandexGPT:', parseError);
+      
+      // Fallback к простому анализу
+      return this.performSimpleAnalysis(url, query);
+    }
+  }
+
+  // Простой анализ как fallback
+  private static async performSimpleAnalysis(url: string, query: string): Promise<AnalysisResult> {
+    const simplePrompt = `Оцени сайт ${url} для запроса "${query}" по шкале 1-10. Ответь только числом.`;
+    
+    try {
+      const scoreResponse = await yandexGPTService.generateCompletion(simplePrompt, {
+        temperature: 0.1,
+        maxTokens: 10
+      });
+      
+      const score = parseInt(scoreResponse) || 5;
+      
+      return {
+        url,
+        query,
+        isInAiAnswer: score >= 7,
+        citabilityScore: Math.min(10, Math.max(1, score)),
+        maxScore: 10,
+        recommendations: this.generateRecommendations(),
+        successChance: Math.min(90, Math.max(30, score * 10)),
+      };
+    } catch (error) {
+      console.error('Ошибка простого анализа:', error);
+      throw error;
     }
   }
 
@@ -63,102 +121,8 @@ export class AnalysisService {
     return shuffled.slice(0, 3);
   }
 
-  // В реальном приложении здесь будут методы для:
-  // - Вызова Yandex Search API v2
-  // - Анализа контента сайта через fetch
-  // - Оценки контента через GPT-4 API
-  
-  static async checkYandexAiAnswer(query: string, targetUrl: string): Promise<boolean> {
-    try {
-      // Используем YandexGPT для симуляции проверки попадания в ответ ИИ
-      const prompt = `Представь, что ты поисковая система Яндекса. При запросе "${query}" 
-      будет ли сайт "${targetUrl}" включен в генеративный ответ? 
-      Ответь только "да" или "нет" без дополнительных объяснений.`;
-      
-      const response = await yandexGPTService.generateCompletion(prompt, {
-        temperature: 0.1,
-        maxTokens: 10
-      });
-      
-      return response.toLowerCase().includes('да');
-    } catch (error) {
-      console.error('Ошибка при проверке попадания в ИИ-ответ:', error);
-      return Math.random() > 0.5; // Fallback
-    }
-  }
-
-  static async analyzeContentWithGPT(content: string, query: string): Promise<{
-    score: number;
-    recommendations: string[];
-  }> {
-    try {
-      // Анализируем контент с помощью YandexGPT
-      const analysisPrompt = `Проанализируй контент сайта на предмет цитируемости в ИИ-поисковиках.
-
-Запрос пользователя: "${query}"
-Контент сайта: "${content.substring(0, 2000)}..." (ограничено для анализа)
-
-Оцени по шкале от 1 до 10:
-1. Релевантность контента запросу
-2. Качество и полнота ответа
-3. Структурированность информации
-4. Экспертность и авторитетность
-
-Дай рекомендации по улучшению в формате списка.`;
-
-      const analysis = await yandexGPTService.generateCompletion(analysisPrompt, {
-        temperature: 0.3,
-        maxTokens: 800
-      });
-
-      // Парсим оценку из ответа (упрощенно)
-      const scoreMatch = analysis.match(/(\d+)\/10|оценка[:\s]*(\d+)/i);
-      const score = scoreMatch ? parseInt(scoreMatch[1] || scoreMatch[2]) : 6;
-      
-      // Извлекаем рекомендации
-      const recommendations = this.extractRecommendations(analysis);
-
-      return {
-        score: Math.min(10, Math.max(1, score)),
-        recommendations: recommendations.length > 0 ? recommendations : this.generateRecommendations()
-      };
-    } catch (error) {
-      console.error('Ошибка при анализе контента:', error);
-      return {
-        score: Math.floor(Math.random() * 6) + 3,
-        recommendations: this.generateRecommendations()
-      };
-    }
-  }
-
-  static async fetchSiteContent(url: string): Promise<string> {
-    try {
-      // В реальном приложении здесь будет прокси-сервер для обхода CORS
-      // Пока используем заглушку с YandexGPT для генерации примерного контента
-      const prompt = `Представь контент сайта ${url}. Опиши, какой контент может быть на этом сайте: основные разделы, статьи, информацию о компании/услугах.`;
-      
-      return await yandexGPTService.generateCompletion(prompt, {
-        temperature: 0.4,
-        maxTokens: 1000
-      });
-    } catch (error) {
-      console.error('Ошибка при получении контента сайта:', error);
-      return 'Не удалось получить контент сайта для анализа';
-    }
-  }
-
-  private static extractRecommendations(analysis: string): string[] {
-    // Простое извлечение рекомендаций из текста
-    const lines = analysis.split('\n');
-    const recommendations: string[] = [];
-    
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (trimmed.match(/^[-•]\s/) || trimmed.match(/^\d+\.\s/)) {
-        recommendations.push(trimmed.replace(/^[-•\d.\s]+/, ''));
-      }
-    }
-    
-    return recommendations.slice(0, 3); // Максимум 3 рекомендации
-  }
+  // Методы для будущего расширения:
+  // - Вызов Yandex Search API v2
+  // - Анализ контента сайта через fetch
+  // - Интеграция с другими ИИ-сервисами
 }
