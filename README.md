@@ -18,11 +18,13 @@
 ## Технологии
 
 - **Frontend**: React 18 + TypeScript + Vite
+- **Backend**: Node.js + Express + SQLite
 - **UI Framework**: shadcn/ui + Radix UI компоненты
 - **Стилизация**: Tailwind CSS с кастомной дизайн-системой
 - **Роутинг**: React Router DOM
 - **Состояние**: React Query (TanStack Query)
-- **Формы**: React Hook Form + Zod валидация
+- **API**: YandexGPT для анализа сайтов
+- **База данных**: SQLite с better-sqlite3
 
 ## Установка и запуск
 
@@ -39,10 +41,22 @@ git clone <YOUR_GIT_URL>
 # Переход в директорию проекта
 cd in-answer-genius
 
-# Установка зависимостей
+# Установка зависимостей фронтенда
 npm install
 
-# Запуск dev-сервера
+# Установка зависимостей бэкенда
+cd backend
+npm install
+
+# Настройка API ключей (обязательно!)
+cp env.example .env
+# Отредактируйте .env с вашими YandexGPT API ключами
+
+# Запуск бэкенда
+npm run dev
+
+# В новом терминале - запуск фронтенда
+cd ..
 npm run dev
 ```
 

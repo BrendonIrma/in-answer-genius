@@ -1,14 +1,34 @@
 import type { AnalysisResult } from '@/components/AnalysisResults';
-import { yandexGPTService } from './yandexGPTService';
 
-// Сервис анализа сайтов с интеграцией YandexGPT
+// Сервис анализа сайтов через бэкенд API
 export class AnalysisService {
+  private static readonly API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+
   static async analyzeWebsite(url: string, query: string): Promise<AnalysisResult> {
     try {
-      // Объединяем все API вызовы в один комплексный запрос
-      const analysisResult = await this.performComprehensiveAnalysis(url, query);
+      console.log('🚀 Отправляем запрос на бэкенд...');
       
-      return analysisResult;
+      const response = await fetch(`${this.API_BASE_URL}/analysis`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url, query }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`API Error: ${response.status} - ${errorData.message || 'Неизвестная ошибка'}`);
+      }
+
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.message || 'Ошибка анализа');
+      }
+
+      console.log('✅ Получен результат от бэкенда');
+      return result.data;
     } catch (error) {
       console.error('Ошибка при анализе сайта:', error);
       
@@ -25,80 +45,26 @@ export class AnalysisService {
     }
   }
 
-  // Новый метод для комплексного анализа одним запросом
-  private static async performComprehensiveAnalysis(url: string, query: string): Promise<AnalysisResult> {
-    const prompt = `Проанализируй сайт для попадания в ответы ИИ-поисковиков.
-
-URL сайта: ${url}
-Запрос пользователя: "${query}"
-
-Выполни комплексный анализ и ответь в JSON формате:
-{
-  "content": "краткое описание контента сайта",
-  "score": число от 1 до 10 (оценка цитируемости),
-  "isInAiAnswer": true/false (попадет ли в ответ ИИ),
-  "recommendations": ["рекомендация 1", "рекомендация 2", "рекомендация 3"]
-}
-
-Оцени по критериям:
-1. Релевантность контента запросу
-2. Качество и полнота ответа
-3. Структурированность информации
-4. Экспертность и авторитетность`;
-
-    const response = await yandexGPTService.generateCompletion(prompt, {
-      temperature: 0.3,
-      maxTokens: 1000
-    });
-
+  // Методы для получения истории и статистики (опционально)
+  static async getAnalysisHistory(limit: number = 10) {
     try {
-      // Парсим JSON ответ
-      const analysis = JSON.parse(response);
-      
-      // Рассчитываем шанс успеха
-      const successChance = Math.min(90, Math.max(30, analysis.score * 10 + (analysis.isInAiAnswer ? 20 : 0)));
-
-      return {
-        url,
-        query,
-        isInAiAnswer: analysis.isInAiAnswer || false,
-        citabilityScore: Math.min(10, Math.max(1, analysis.score || 5)),
-        maxScore: 10,
-        recommendations: analysis.recommendations || this.generateRecommendations(),
-        successChance,
-      };
-    } catch (parseError) {
-      console.error('Ошибка парсинга ответа YandexGPT:', parseError);
-      
-      // Fallback к простому анализу
-      return this.performSimpleAnalysis(url, query);
+      const response = await fetch(`${this.API_BASE_URL}/analysis/history?limit=${limit}`);
+      const result = await response.json();
+      return result.success ? result.data : [];
+    } catch (error) {
+      console.error('Ошибка получения истории:', error);
+      return [];
     }
   }
 
-  // Простой анализ как fallback
-  private static async performSimpleAnalysis(url: string, query: string): Promise<AnalysisResult> {
-    const simplePrompt = `Оцени сайт ${url} для запроса "${query}" по шкале 1-10. Ответь только числом.`;
-    
+  static async getAnalysisStats() {
     try {
-      const scoreResponse = await yandexGPTService.generateCompletion(simplePrompt, {
-        temperature: 0.1,
-        maxTokens: 10
-      });
-      
-      const score = parseInt(scoreResponse) || 5;
-      
-      return {
-        url,
-        query,
-        isInAiAnswer: score >= 7,
-        citabilityScore: Math.min(10, Math.max(1, score)),
-        maxScore: 10,
-        recommendations: this.generateRecommendations(),
-        successChance: Math.min(90, Math.max(30, score * 10)),
-      };
+      const response = await fetch(`${this.API_BASE_URL}/analysis/stats`);
+      const result = await response.json();
+      return result.success ? result.data : null;
     } catch (error) {
-      console.error('Ошибка простого анализа:', error);
-      throw error;
+      console.error('Ошибка получения статистики:', error);
+      return null;
     }
   }
 
