@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    outDir: 'dist',
+    outDir: 'dist/in-answer-genius/browser',
     assetsDir: 'assets',
     target: 'esnext',
     minify: 'esbuild',

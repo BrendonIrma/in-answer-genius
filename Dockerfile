@@ -20,7 +20,7 @@ RUN npm run build
 FROM nginx:alpine
 
 # Копируем собранное приложение
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/dist/in-answer-genius/browser /usr/share/nginx/html
 
 # Копируем конфигурацию nginx
 COPY nginx.conf /etc/nginx/nginx.conf
