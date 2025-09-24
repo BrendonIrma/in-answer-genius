@@ -18,6 +18,8 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
     target: 'esnext',
     minify: 'esbuild',
     rollupOptions: {
