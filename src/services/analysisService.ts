@@ -6,10 +6,9 @@ export class AnalysisService {
   private static readonly IS_PRODUCTION = import.meta.env.PROD;
 
   static async analyzeWebsite(url: string, query: string): Promise<AnalysisResult> {
-    // В продакшене пока используем только fallback (бэкенд не деплоен)
+    // В продакшене используем реальный API, если он доступен
     if (this.IS_PRODUCTION) {
-      console.log('Продакшен режим: используем fallback данные');
-      return this.generateFallbackResult(url, query);
+      console.log('Продакшен режим: пытаемся подключиться к API');
     }
 
     try {

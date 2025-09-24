@@ -1,0 +1,14 @@
+{
+  "name": "in-answer-backend",
+  "type": "nodejs",
+  "build": {
+    "command": "npm install",
+    "output": "."
+  },
+  "start": {
+    "command": "npm start"
+  },
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
