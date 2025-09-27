@@ -1,8 +1,8 @@
-# Многоэтапная сборка для фронтенда
-FROM node:18-alpine as builder
+# Dockerfile для Timeweb Cloud
+FROM node:18-alpine
 
 # Устанавливаем рабочую директорию
-WORKDIR /app
+WORKDIR /opt/build
 
 # Копируем package.json и package-lock.json
 COPY package*.json ./
@@ -20,10 +20,7 @@ RUN npm run build
 FROM nginx:alpine
 
 # Копируем собранное приложение
-COPY --from=builder /app/dist/in-answer-genius/browser /usr/share/nginx/html
-
-# Копируем конфигурацию nginx
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY --from=0 /opt/build/dist/in-answer-genius/browser /usr/share/nginx/html
 
 # Открываем порт
 EXPOSE 80
