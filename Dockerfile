@@ -27,12 +27,11 @@ COPY nginx.conf /etc/nginx/nginx.conf
 
 # Устанавливаем зависимости бэкенда
 WORKDIR /opt/backend
-COPY backend/package*.json ./
+COPY backend-package.json package.json
 RUN npm ci --only=production
 
 # Копируем код бэкенда
-COPY backend/src ./src
-COPY backend/package*.json ./
+COPY backend-src ./src
 
 # Создаем директорию для базы данных
 RUN mkdir -p data
