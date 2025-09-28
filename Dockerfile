@@ -20,7 +20,7 @@ RUN npm run build
 FROM nginx:alpine
 
 # Копируем собранное приложение
-COPY --from=0 /opt/build/dist/in-answer-genius/browser /usr/share/nginx/html
+COPY --from=0 /opt/build/dist /usr/share/nginx/html
 
 # Открываем порт
 EXPOSE 80
