@@ -48,6 +48,16 @@ app.use((req, res, next) => {
   next();
 });
 
+// Корневой маршрут
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    message: 'InAnswer работает!',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0'
+  });
+});
+
 // Маршруты
 app.use('/api/analysis', analysisRoutes);
 
