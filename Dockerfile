@@ -28,7 +28,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # Устанавливаем зависимости бэкенда
 WORKDIR /opt/backend
 COPY backend-package.json package.json
-RUN npm ci --only=production
+RUN npm install --only=production
 
 # Копируем код бэкенда
 COPY backend-src ./src
