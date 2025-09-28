@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { mkdirSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -8,18 +9,12 @@ const __dirname = dirname(__filename);
 // Используем переменную окружения DB_PATH или путь по умолчанию
 const dbPath = process.env.DB_PATH || join(__dirname, '../../data/analyses.db');
 
-console.log('DB_PATH from env:', process.env.DB_PATH);
-console.log('Final dbPath:', dbPath);
-
 // Создаем директорию для базы данных
-import { mkdirSync } from 'fs';
 const dbDir = dirname(dbPath);
 try {
   mkdirSync(dbDir, { recursive: true });
-  console.log('Database directory created:', dbDir);
 } catch (err) {
   // Директория уже существует
-  console.log('Database directory already exists:', dbDir);
 }
 
 let db;
