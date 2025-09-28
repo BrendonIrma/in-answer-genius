@@ -6,9 +6,17 @@ RUN apk add --no-cache nginx
 
 # ===== ФРОНТЕНД =====
 WORKDIR /app/frontend
+
+# Копируем package.json и package-lock.json
 COPY package*.json ./
+
+# Устанавливаем зависимости
 RUN npm ci
+
+# Копируем исходный код
 COPY . .
+
+# Собираем приложение
 RUN npm run build
 
 # Копируем фронтенд в nginx
@@ -16,8 +24,12 @@ RUN cp -r dist/in-answer-genius/browser/* /usr/share/nginx/html/
 
 # ===== БЭКЕНД =====
 WORKDIR /app/backend
+
+# Копируем package.json бэкенда
 COPY backend/package*.json ./
-RUN npm install --only=production
+
+# Устанавливаем зависимости бэкенда
+RUN npm ci --only=production
 
 # Копируем код бэкенда
 COPY backend/src ./src
@@ -40,5 +52,8 @@ RUN echo '#!/bin/sh' > /start.sh && \
     echo 'npm start' >> /start.sh && \
     chmod +x /start.sh
 
+# Открываем порт
 EXPOSE 80
+
+# Запускаем nginx и бэкенд
 CMD ["/start.sh"]

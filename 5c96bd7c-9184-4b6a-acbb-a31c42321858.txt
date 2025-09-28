@@ -1,0 +1,82 @@
+13:09:08 | Found ports for service app: ('0.0.0.0', 80)
+13:09:08 | Cloning code
+13:09:09 | Cloning code
+13:09:11 | Building final layer
+13:09:11 | DEBUG | #0 building with "default" instance using docker driver
+13:09:11 | DEBUG | 
+13:09:11 | DEBUG | #1 [internal] load build definition from Dockerfile
+13:09:11 | DEBUG | #1 transferring dockerfile: 1.43kB done
+13:09:11 | DEBUG | #1 DONE 0.0s
+13:09:11 | DEBUG | 
+13:09:11 | DEBUG | #2 [internal] load metadata for docker.io/library/node:18-alpine
+13:09:12 | DEBUG | #2 DONE 0.7s
+13:09:12 | DEBUG | 
+13:09:12 | DEBUG | #3 [internal] load .dockerignore
+13:09:12 | DEBUG | #3 transferring context: 245B done
+13:09:12 | DEBUG | #3 DONE 0.0s
+13:09:12 | DEBUG | 
+13:09:12 | DEBUG | #4 [ 1/17] FROM docker.io/library/node:18-alpine@sha256:8d6421d663b4c28fd3ebc498332f249011d118945588d0a35cb9bc4b8ca09d9e
+13:09:12 | DEBUG | #4 DONE 0.0s
+13:09:12 | DEBUG | 
+13:09:12 | DEBUG | #5 [ 2/17] WORKDIR /opt/build
+13:09:12 | DEBUG | #5 CACHED
+13:09:12 | DEBUG | 
+13:09:12 | DEBUG | #6 [internal] load build context
+13:09:12 | DEBUG | #6 transferring context: 521.14kB 0.1s done
+13:09:12 | DEBUG | #6 DONE 0.1s
+13:09:12 | DEBUG | 
+13:09:12 | DEBUG | #7 [12/17] RUN npm ci --only=production
+13:09:12 | DEBUG | #7 CACHED
+13:09:12 | DEBUG | 
+13:09:12 | DEBUG | #8 [11/17] COPY backend/package*.json ./
+13:09:12 | DEBUG | #8 CACHED
+13:09:12 | DEBUG | 
+13:09:12 | DEBUG | #9 [ 4/17] RUN npm ci
+13:09:12 | DEBUG | #9 CACHED
+13:09:12 | DEBUG | 
+13:09:12 | DEBUG | #10 [ 9/17] COPY nginx.conf /etc/nginx/nginx.conf
+13:09:12 | DEBUG | #10 CACHED
+13:09:12 | DEBUG | 
+13:09:12 | DEBUG | #11 [10/17] WORKDIR /opt/backend
+13:09:12 | DEBUG | #11 CACHED
+13:09:12 | DEBUG | 
+13:09:12 | DEBUG | #12 [14/17] COPY backend/package*.json ./
+13:09:12 | DEBUG | #12 CACHED
+13:09:12 | DEBUG | 
+13:09:12 | DEBUG | #13 [ 5/17] COPY . .
+13:09:12 | DEBUG | #13 CACHED
+13:09:12 | DEBUG | 
+13:09:12 | DEBUG | #14 [ 8/17] RUN cp -r dist/in-answer-genius/browser/* /var/www/localhost/htdocs/
+13:09:12 | DEBUG | #14 CACHED
+13:09:12 | DEBUG | 
+13:09:12 | DEBUG | #15 [ 6/17] RUN npm run build
+13:09:12 | DEBUG | #15 CACHED
+13:09:12 | DEBUG | 
+13:09:12 | DEBUG | #16 [ 7/17] RUN apk add --no-cache nginx
+13:09:12 | DEBUG | #16 CACHED
+13:09:12 | DEBUG | 
+13:09:12 | DEBUG | #17 [15/17] COPY backend/env.example ./
+13:09:12 | DEBUG | #17 ERROR: failed to calculate checksum of ref d25cfeaa-5539-41a3-a9df-443468a276bf::pnvopaufyiyedppgpnq4zv90r: "/backend/env.example": not found
+13:09:12 | DEBUG | 
+13:09:12 | DEBUG | #18 [13/17] COPY backend/src ./src
+13:09:12 | DEBUG | #18 ERROR: failed to calculate checksum of ref d25cfeaa-5539-41a3-a9df-443468a276bf::pnvopaufyiyedppgpnq4zv90r: "/backend/src": not found
+13:09:12 | DEBUG | 
+13:09:12 | DEBUG | #19 [ 3/17] COPY package*.json ./
+13:09:12 | DEBUG | #19 CANCELED
+13:09:12 | DEBUG | ------
+13:09:12 | DEBUG |  > [13/17] COPY backend/src ./src:
+13:09:12 | DEBUG | ------
+13:09:12 | DEBUG | ------
+13:09:12 | DEBUG |  > [15/17] COPY backend/env.example ./:
+13:09:12 | DEBUG | ------
+13:09:12 | DEBUG | Dockerfile:36
+13:09:12 | DEBUG | --------------------
+13:09:12 | DEBUG |   34 |     COPY backend/src ./src
+13:09:12 | DEBUG |   35 |     COPY backend/package*.json ./
+13:09:12 | DEBUG |   36 | >>> COPY backend/env.example ./
+13:09:12 | DEBUG |   37 |     
+13:09:12 | DEBUG |   38 |     # Создаем директорию для базы данных
+13:09:12 | DEBUG | --------------------
+13:09:12 | DEBUG | ERROR: failed to build: failed to solve: failed to compute cache key: failed to calculate checksum of ref d25cfeaa-5539-41a3-a9df-443468a276bf::pnvopaufyiyedppgpnq4zv90r: "/backend/env.example": not found
+13:09:12 | Layer None built successfully
+13:09:12 | ERROR | Deploy error

@@ -5,14 +5,12 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Используем переменную окружения DB_PATH или путь по умолчанию
-const dbPath = process.env.DB_PATH || join(__dirname, '../data/analyses.db');
+const dbPath = join(__dirname, '../../data/analyses.db');
 
 // Создаем директорию для базы данных
 import { mkdirSync } from 'fs';
-const dbDir = dirname(dbPath);
 try {
-  mkdirSync(dbDir, { recursive: true });
+  mkdirSync(join(__dirname, '../../data'), { recursive: true });
 } catch (err) {
   // Директория уже существует
 }
