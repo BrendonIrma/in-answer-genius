@@ -20,7 +20,7 @@ RUN npm run build
 RUN apk add --no-cache nginx
 
 # Копируем собранное приложение
-RUN cp -r dist/in-answer-genius/browser/* /var/www/localhost/htdocs/
+RUN cp -r dist/in-answer-genius/browser/* /usr/share/nginx/html/
 
 # Копируем конфигурацию nginx
 COPY nginx.conf /etc/nginx/nginx.conf
