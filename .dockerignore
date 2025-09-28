@@ -12,6 +12,5 @@ npm-debug.log
 README.md
 DEPLOY_TIMEWEB.md
 docker-compose.yml
-backend/
 docs/
 dist/

@@ -26,16 +26,14 @@ COPY components.json ./
 # Собираем приложение
 RUN npm run build
 
-# Создаем директорию nginx и копируем фронтенд
-RUN mkdir -p /usr/share/nginx/html && \
-    cp -r dist/in-answer-genius/browser/* /usr/share/nginx/html/
+# Копируем фронтенд в nginx
+RUN cp -r dist/in-answer-genius/browser/* /usr/share/nginx/html/
 
 # ===== БЭКЕНД =====
 WORKDIR /app/backend
 
 # Копируем package.json бэкенда
-COPY backend/package.json ./
-COPY backend/package-lock.json ./
+COPY backend/package*.json ./
 
 # Устанавливаем зависимости бэкенда
 RUN npm ci --only=production
