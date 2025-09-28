@@ -31,7 +31,9 @@ COPY backend/package*.json ./
 RUN npm ci --only=production
 
 # Копируем код бэкенда
-COPY backend/ ./
+COPY backend/src ./src
+COPY backend/package*.json ./
+COPY backend/env.example ./
 
 # Создаем директорию для базы данных
 RUN mkdir -p data
