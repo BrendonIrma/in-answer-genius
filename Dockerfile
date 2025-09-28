@@ -33,15 +33,25 @@ RUN npm ci --only=production
 # Копируем код бэкенда
 COPY backend/src ./src
 COPY backend/package*.json ./
-COPY backend/env.example ./
 
 # Создаем директорию для базы данных
 RUN mkdir -p data
 
+# Создаем .env файл для бэкенда
+RUN echo 'NODE_ENV=production' > .env && \
+    echo 'PORT=3001' >> .env && \
+    echo 'DB_PATH=/opt/backend/data/analyses.db' >> .env
+
 # Создаем скрипт запуска
 RUN echo '#!/bin/sh' > /start.sh && \
     echo 'nginx -g "daemon off;" &' >> /start.sh && \
-    echo 'cd /opt/backend && npm start' >> /start.sh && \
+    echo 'cd /opt/backend' >> /start.sh && \
+    echo 'export YANDEX_API_KEY=${YANDEX_API_KEY}' >> /start.sh && \
+    echo 'export YANDEX_FOLDER_ID=${YANDEX_FOLDER_ID}' >> /start.sh && \
+    echo 'export NODE_ENV=production' >> /start.sh && \
+    echo 'export PORT=3001' >> /start.sh && \
+    echo 'export DB_PATH=/opt/backend/data/analyses.db' >> /start.sh && \
+    echo 'npm start' >> /start.sh && \
     chmod +x /start.sh
 
 # Открываем порт
