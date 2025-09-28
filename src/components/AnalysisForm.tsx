@@ -10,7 +10,7 @@ interface AnalysisFormProps {
   isLoading: boolean;
 }
 
-export function AnalysisForm({ onAnalyze, isLoading }: AnalysisFormProps) {
+function AnalysisForm({ onAnalyze, isLoading }: AnalysisFormProps) {
   const [url, setUrl] = useState('');
   const [query, setQuery] = useState('');
 
@@ -86,3 +86,5 @@ export function AnalysisForm({ onAnalyze, isLoading }: AnalysisFormProps) {
     </Card>
   );
 }
+
+export default AnalysisForm;

@@ -36,6 +36,12 @@ class YandexGPTService {
     };
 
     try {
+      console.log('🚀 Отправляем запрос к YandexGPT API...');
+      console.log('📡 URL:', this.baseUrl);
+      console.log('🔑 API Key:', this.apiKey ? `${this.apiKey.substring(0, 10)}...` : 'НЕ УСТАНОВЛЕН');
+      console.log('📁 Folder ID:', this.folderId);
+      console.log('📝 Запрос:', JSON.stringify(request, null, 2));
+      
       const response = await axios.post(this.baseUrl, request, {
         headers: {
           'Authorization': `Api-Key ${this.apiKey}`,
@@ -43,6 +49,10 @@ class YandexGPTService {
         },
         timeout: 30000 // 30 секунд таймаут
       });
+      
+      console.log('✅ Получен ответ от YandexGPT API');
+      console.log('📊 Статус:', response.status);
+      console.log('📄 Ответ:', JSON.stringify(response.data, null, 2));
 
       if (response.data?.result?.alternatives?.[0]?.message?.text) {
         return response.data.result.alternatives[0].message.text;
@@ -51,7 +61,11 @@ class YandexGPTService {
       }
 
     } catch (error) {
-      console.error('Ошибка YandexGPT API:', error.response?.data || error.message);
+      console.error('❌ Ошибка YandexGPT API:');
+      console.error('📊 Статус:', error.response?.status);
+      console.error('📄 Данные ошибки:', error.response?.data);
+      console.error('💬 Сообщение:', error.message);
+      console.error('🔗 URL:', error.config?.url);
       
       if (error.response?.status === 401) {
         throw new Error('Неверный API ключ YandexGPT');
@@ -76,16 +90,28 @@ URL сайта: ${url}
 Выполни комплексный анализ и ответь в JSON формате:
 {
   "content": "краткое описание контента сайта",
-  "score": число от 1 до 10 (оценка цитируемости),
+  "score": число от 1 до 10 (общая оценка цитируемости),
   "isInAiAnswer": true/false (попадет ли в ответ ИИ),
+  "criteria": {
+    "relevance": число от 1 до 10 (релевантность запросу),
+    "completeness": число от 1 до 10 (полнота ответа),
+    "structure": число от 1 до 10 (структурированность),
+    "authority": число от 1 до 10 (экспертность и авторитетность),
+    "freshness": число от 1 до 10 (актуальность информации),
+    "readability": число от 1 до 10 (читаемость и понятность)
+  },
+  "strengths": ["сильная сторона 1", "сильная сторона 2"],
+  "weaknesses": ["слабая сторона 1", "слабая сторона 2"],
   "recommendations": ["рекомендация 1", "рекомендация 2", "рекомендация 3"]
 }
 
 Оцени по критериям:
-1. Релевантность контента запросу
-2. Качество и полнота ответа
-3. Структурированность информации
-4. Экспертность и авторитетность`;
+1. Релевантность контента запросу (насколько точно отвечает на вопрос)
+2. Качество и полнота ответа (исчерпывающий ли ответ)
+3. Структурированность информации (заголовки, списки, таблицы)
+4. Экспертность и авторитетность (квалификация автора, источники)
+5. Актуальность информации (свежесть данных)
+6. Читаемость и понятность (простота восприятия)`;
 
     try {
       const response = await this.generateCompletion(prompt, {
@@ -93,8 +119,9 @@ URL сайта: ${url}
         maxTokens: 1000
       });
 
-      // Парсим JSON ответ
-      const analysis = JSON.parse(response);
+      // Очищаем ответ от markdown и парсим JSON
+      const cleanedResponse = this.extractJsonFromMarkdown(response);
+      const analysis = JSON.parse(cleanedResponse);
       
       // Валидируем данные
       if (typeof analysis.score !== 'number' || analysis.score < 1 || analysis.score > 10) {
@@ -105,8 +132,29 @@ URL сайта: ${url}
         analysis.isInAiAnswer = analysis.score >= 7;
       }
       
+      // Валидируем критерии
+      if (!analysis.criteria || typeof analysis.criteria !== 'object') {
+        analysis.criteria = {
+          relevance: 5,
+          completeness: 5,
+          structure: 5,
+          authority: 5,
+          freshness: 5,
+          readability: 5
+        };
+      }
+      
+      // Валидируем массивы
       if (!Array.isArray(analysis.recommendations)) {
         analysis.recommendations = this.getDefaultRecommendations();
+      }
+      
+      if (!Array.isArray(analysis.strengths)) {
+        analysis.strengths = [];
+      }
+      
+      if (!Array.isArray(analysis.weaknesses)) {
+        analysis.weaknesses = [];
       }
 
       return analysis;
@@ -133,6 +181,16 @@ URL сайта: ${url}
         content: `Анализ сайта ${url}`,
         score: Math.min(10, Math.max(1, score)),
         isInAiAnswer: score >= 7,
+        criteria: {
+          relevance: score,
+          completeness: score,
+          structure: score,
+          authority: score,
+          freshness: score,
+          readability: score
+        },
+        strengths: ['Быстрый анализ выполнен'],
+        weaknesses: ['Ограниченный анализ'],
         recommendations: this.getDefaultRecommendations()
       };
     } catch (error) {
@@ -147,6 +205,30 @@ URL сайта: ${url}
       'Создайте раздел FAQ с популярными вопросами и краткими ответами. Это увеличивает шансы попадания в генеративные ответы.',
       'Добавьте структурированные данные (JSON-LD) для лучшего понимания контента поисковыми системами.'
     ];
+  }
+
+  // Извлекает JSON из markdown ответа
+  extractJsonFromMarkdown(text) {
+    // Убираем markdown блоки кода
+    const codeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/g;
+    const matches = text.match(codeBlockRegex);
+    
+    if (matches && matches.length > 0) {
+      // Берем первый блок кода
+      const jsonText = matches[0].replace(/```(?:json)?\s*/, '').replace(/\s*```/, '');
+      return jsonText.trim();
+    }
+    
+    // Ищем JSON в тексте (начинается с { и заканчивается })
+    const jsonRegex = /\{[\s\S]*\}/;
+    const jsonMatch = text.match(jsonRegex);
+    
+    if (jsonMatch) {
+      return jsonMatch[0];
+    }
+    
+    // Если ничего не найдено, возвращаем исходный текст
+    return text.trim();
   }
 }
 

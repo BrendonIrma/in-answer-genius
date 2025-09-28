@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, XCircle, TrendingUp, AlertTriangle, RefreshCw, Plus } from 'lucide-react';
+import { CheckCircle, XCircle, TrendingUp, AlertTriangle, RefreshCw, Plus, Star, Target, BookOpen, Shield, Clock, Eye, ThumbsUp, ThumbsDown } from 'lucide-react';
 
 export interface AnalysisResult {
   url: string;
@@ -11,6 +11,17 @@ export interface AnalysisResult {
   maxScore: number;
   recommendations: string[];
   successChance: number;
+  criteria?: {
+    relevance: number;
+    completeness: number;
+    structure: number;
+    authority: number;
+    freshness: number;
+    readability: number;
+  };
+  strengths?: string[];
+  weaknesses?: string[];
+  content?: string;
 }
 
 interface AnalysisResultsProps {
@@ -19,7 +30,35 @@ interface AnalysisResultsProps {
   onNewAnalysis: () => void;
 }
 
-export function AnalysisResults({ result, onRetry, onNewAnalysis }: AnalysisResultsProps) {
+// Компонент для отображения критерия
+const CriteriaItem = ({ icon: Icon, label, score, max = 10 }: { icon: any, label: string, score: number, max?: number }) => {
+  const percentage = (score / max) * 100;
+  const getColor = () => {
+    if (percentage >= 80) return 'text-green-600';
+    if (percentage >= 60) return 'text-yellow-600';
+    return 'text-red-600';
+  };
+
+  return (
+    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+      <div className="flex items-center gap-3">
+        <Icon className="w-5 h-5 text-gray-600" />
+        <span className="font-medium text-gray-700">{label}</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="w-20 bg-gray-200 rounded-full h-2">
+          <div 
+            className={`h-2 rounded-full transition-all duration-300 ${percentage >= 80 ? 'bg-green-500' : percentage >= 60 ? 'bg-yellow-500' : 'bg-red-500'}`}
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+        <span className={`font-bold ${getColor()}`}>{score}/{max}</span>
+      </div>
+    </div>
+  );
+};
+
+function AnalysisResults({ result, onRetry, onNewAnalysis }: AnalysisResultsProps) {
   const getScoreColor = (score: number, max: number) => {
     const percentage = (score / max) * 100;
     if (percentage >= 80) return 'text-success';
@@ -115,6 +154,78 @@ export function AnalysisResults({ result, onRetry, onNewAnalysis }: AnalysisResu
         </CardContent>
       </Card>
 
+      {/* Детальные критерии */}
+      {result.criteria && (
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="w-5 h-5" />
+              Детальная оценка
+            </CardTitle>
+            <CardDescription>
+              Анализ по различным критериям качества контента
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3">
+              <CriteriaItem icon={Target} label="Релевантность" score={result.criteria.relevance} />
+              <CriteriaItem icon={BookOpen} label="Полнота ответа" score={result.criteria.completeness} />
+              <CriteriaItem icon={TrendingUp} label="Структурированность" score={result.criteria.structure} />
+              <CriteriaItem icon={Shield} label="Экспертность" score={result.criteria.authority} />
+              <CriteriaItem icon={Clock} label="Актуальность" score={result.criteria.freshness} />
+              <CriteriaItem icon={Eye} label="Читаемость" score={result.criteria.readability} />
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Сильные и слабые стороны */}
+      {(result.strengths?.length || result.weaknesses?.length) && (
+        <div className="grid md:grid-cols-2 gap-6">
+          {result.strengths?.length > 0 && (
+            <Card className="shadow-md">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-green-600">
+                  <ThumbsUp className="w-5 h-5" />
+                  Сильные стороны
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  {result.strengths.map((strength, index) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-gray-700">{strength}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          )}
+
+          {result.weaknesses?.length > 0 && (
+            <Card className="shadow-md">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-red-600">
+                  <ThumbsDown className="w-5 h-5" />
+                  Слабые стороны
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  {result.weaknesses.map((weakness, index) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <XCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-gray-700">{weakness}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+
       {/* Информация об анализе */}
       <Card className="shadow-md">
         <CardHeader>
@@ -156,3 +267,5 @@ export function AnalysisResults({ result, onRetry, onNewAnalysis }: AnalysisResu
     </div>
   );
 }
+
+export default AnalysisResults;
