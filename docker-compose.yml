@@ -10,9 +10,4 @@ services:
       - "443:443"
     environment:
       - NODE_ENV=production
-      - PORT=3001
-      - FRONTEND_URL=https://www.inanswer.pro
-      - YANDEX_API_KEY=${YANDEX_API_KEY}
-      - YANDEX_FOLDER_ID=${YANDEX_FOLDER_ID}
-      - DB_PATH=/app/data/analyses.db
     restart: unless-stopped
