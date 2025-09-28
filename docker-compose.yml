@@ -26,9 +26,4 @@ services:
       - YANDEX_API_KEY=${YANDEX_API_KEY}
       - YANDEX_FOLDER_ID=${YANDEX_FOLDER_ID}
       - DB_PATH=/app/data/analyses.db
-    volumes:
-      - backend_data:/app/data
     restart: unless-stopped
-
-volumes:
-  backend_data:
