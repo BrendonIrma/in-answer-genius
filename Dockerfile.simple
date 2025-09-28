@@ -1,4 +1,4 @@
-# Простой Dockerfile для Timeweb Cloud - только фронтенд
+# Простой Dockerfile для Timeweb Cloud
 FROM node:18-alpine
 
 # Устанавливаем рабочую директорию
