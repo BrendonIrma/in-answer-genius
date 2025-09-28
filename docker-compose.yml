@@ -5,9 +5,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "80:80"
-      - "443:443"
+  ports:
+    - "80:80"
+    - "443:443"
     environment:
       - NODE_ENV=production
       - FRONTEND_URL=http://www.inanswer.pro

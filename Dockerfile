@@ -54,7 +54,7 @@ RUN echo '#!/bin/sh' > /start.sh && \
     chmod +x /start.sh
 
 # Открываем порт
-EXPOSE 80
+EXPOSE 80 443
 
 # Запускаем nginx и бэкенд
 CMD ["/start.sh"]
