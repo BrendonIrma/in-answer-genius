@@ -10,11 +10,5 @@ services:
       - "443:443"
     environment:
       - NODE_ENV=production
-      - PORT=3001
-      - FRONTEND_URL=https://www.inanswer.pro
-      - YANDEX_API_KEY=AQVN0SCNpELF9pagIh5CU0Gt2UNzveLcNEuOy9Aw
-      - YANDEX_FOLDER_ID=b1g4854pso9q87p5lg8p
-      - DB_PATH=/app/data/analyses.db
-      - RATE_LIMIT_WINDOW_MS=900000
-      - RATE_LIMIT_MAX_REQUESTS=100
+      - FRONTEND_URL=http://brendonirma-in-answer-genius-9f96.twc1.net
     restart: unless-stopped
