@@ -10,5 +10,5 @@ services:
       - "443:443"
     environment:
       - NODE_ENV=production
-      - FRONTEND_URL=http://brendonirma-in-answer-genius-9f96.twc1.net
+      - FRONTEND_URL=http://www.inanswer.pro
     restart: unless-stopped
