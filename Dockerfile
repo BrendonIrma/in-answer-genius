@@ -42,13 +42,17 @@ COPY nginx.conf /etc/nginx/nginx.conf
 
 # ===== СКРИПТ ЗАПУСКА =====
 RUN echo '#!/bin/sh' > /start.sh && \
-    echo 'nginx -g "daemon off;" &' >> /start.sh && \
-    echo 'cd /app/backend' >> /start.sh && \
+    echo 'echo "🚀 Запуск InAnswer на Timeweb Cloud..."' >> /start.sh && \
+    echo 'echo "🔧 Настройка переменных окружения..."' >> /start.sh && \
     echo 'export YANDEX_API_KEY=${YANDEX_API_KEY}' >> /start.sh && \
     echo 'export YANDEX_FOLDER_ID=${YANDEX_FOLDER_ID}' >> /start.sh && \
     echo 'export NODE_ENV=production' >> /start.sh && \
     echo 'export PORT=3001' >> /start.sh && \
     echo 'export DB_PATH=/app/backend/data/analyses.db' >> /start.sh && \
+    echo 'echo "🌐 Запуск nginx..."' >> /start.sh && \
+    echo 'nginx -g "daemon off;" &' >> /start.sh && \
+    echo 'echo "🔧 Запуск бэкенда..."' >> /start.sh && \
+    echo 'cd /app/backend' >> /start.sh && \
     echo 'npm start' >> /start.sh && \
     chmod +x /start.sh
 
