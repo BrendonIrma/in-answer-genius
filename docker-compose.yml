@@ -13,6 +13,8 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+    networks:
+      - app-network
 
   backend:
     build:
@@ -28,3 +30,9 @@ services:
       - YANDEX_FOLDER_ID=${YANDEX_FOLDER_ID}
       - DB_PATH=/app/data/analyses.db
     restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
